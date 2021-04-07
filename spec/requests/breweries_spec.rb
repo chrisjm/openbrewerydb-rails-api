@@ -207,6 +207,134 @@ RSpec.describe "Breweries API", type: :request do
     end
   end
 
+  describe "GET /breweries/search" do
+    before do
+      create_list(
+        :brewery,
+        1,
+        name: "Bob's Brewing Co. - Athens, Ohio",
+        state: "Ohio",
+        city: "Athens"
+      )
+      create_list(
+        :brewery,
+        1,
+        name: "Jane's Brewing Co. - Alb, NM",
+        state: "New Mexico",
+        city: "Albuquerque"
+      )
+      create_list(
+        :brewery,
+        1,
+        name: "Old English Brewery",
+        county_province: "East Sussex",
+        country: "England"
+      )
+      create_list(:brewery, 1, state: "Ohio")
+      create_list(:brewery, 1, city: "Athens", state: "Ohio")
+    end
+
+    context "when no params are passed" do
+      before do
+        get "/breweries/search"
+      end
+
+      it "returns a status of 200" do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns no results" do
+        expect(json).to be_empty
+      end
+    end
+
+    context "when valid params are passed" do
+      it "returns a status of 200" do
+        get "/breweries/search", params: { query: "bob" }
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns the correct number of breweries for 'bob'" do
+        get "/breweries/search", params: { query: "bob" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(1)
+      end
+
+      it "returns the correct number of breweries for 'athens'" do
+        get "/breweries/search", params: { query: "athens" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(2)
+      end
+
+      it "returns the correct number of breweries for 'ohio'" do
+        get "/breweries/search", params: { query: "ohio" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(3)
+      end
+
+      it "returns the correct number of breweries for 'sussex'" do
+        get "/breweries/search", params: { query: "sussex" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(1)
+      end
+    end
+  end
+
+  describe "GET /breweries/autocomplete" do
+    before do
+      create_list(
+        :brewery,
+        1,
+        name: "Bob's Brewing Co. - Athens, Ohio",
+        state: "Ohio",
+        city: "Athens"
+      )
+      create_list(
+        :brewery,
+        1,
+        name: "Jane's Brewing Co. - Alb, NM",
+        state: "New Mexico",
+        city: "Albuquerque"
+      )
+      create_list(:brewery, 1, state: "Ohio")
+      create_list(:brewery, 1, city: "Athens", state: "Ohio")
+    end
+
+    context "when no params are passed" do
+      before do
+        get "/breweries/autocomplete"
+      end
+
+      it "returns a status of 200" do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns no results" do
+        expect(json).to be_empty
+      end
+    end
+
+    context "when valid params are passed" do
+      it "returns the correct number of breweries for 'bob'" do
+        get "/breweries/autocomplete", params: { query: "bob" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(1)
+      end
+
+      it "returns the correct number of breweries for 'oh'" do
+        get "/breweries/autocomplete", params: { query: "oh" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(3)
+      end
+
+      it "returns the correct number of breweries for 'al'" do
+        get "/breweries/autocomplete", params: { query: "al" }
+        expect(json).not_to be_empty
+        expect(json.size).to eq(1)
+      end
+    end
+  end
+
   describe "GET /breweries/:id" do
     let!(:brewery) { create(:brewery) }
     let(:brewery_id) { brewery.id }

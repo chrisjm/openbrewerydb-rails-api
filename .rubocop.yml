@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.6
   Include:
     - "config.ru"
     - "Gemfile"
@@ -19,10 +19,10 @@ AllCops:
     - "tmp/**/*"
     - ".git/**/*"
 
-Documentation:
+Style/Documentation:
   Enabled: false
 
-IndentationConsistency:
+Layout/IndentationConsistency:
   EnforcedStyle: "indented_internal_methods"
 
 Metrics/BlockLength:

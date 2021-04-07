@@ -41,20 +41,10 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
     DatabaseCleaner.strategy = :transaction
-
-    # Disable Elastic Search testing for now (too slow even with test clusters)
-    Searchkick.disable_callbacks
   end
 
   config.around(:each) do |example|
     DatabaseCleaner.cleaning do
-      example.run
-    end
-  end
-
-  # For when we want to test search
-  config.around(:each, search: true) do |example|
-    Searchkick.callbacks(true) do
       example.run
     end
   end
